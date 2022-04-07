@@ -14,5 +14,18 @@ typedef struct  {
     struct User *Followers[20];
     struct User *Following[20];
 }User ;
+
+typedef struct {
+    char author[15];
+    char text[280];
+    struct tweet *nextTwt;
+}tweet;
+
+typedef struct {
+    User *allUsers[24];
+    int numUsers;
+    tweet *firstTwt;
+}TwitterSys;
+
 void displayUserData(User *n);
-void createUsers(void);
+TwitterSys * createUsers(void);
