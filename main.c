@@ -8,10 +8,12 @@
 
 int menu(TwitterSys* System,int currentUser);
 void follow(TwitterSys* System,int currentUser);
+void unFollow(TwitterSys* System,int currentUser);
+void createTweet(TwitterSys* System,int currentUser);
+
 int main() {
     TwitterSys *System = createUsers();
     for (int i = 0; i < (System->numUsers); ++i) {
-        displayUserData((System->allUsers[i]));
         // menu system for choosing from the other functions
        if( menu(System,i)==0){
            printf("That didnt work");
@@ -23,11 +25,13 @@ int menu(TwitterSys *System,int currentUser){
     int Selection = 0;
     int Run = 1;
     while (Run == 1) {
-        printf("Please choose from the 6 options. \n(1) Follow Someone. \n(2) UnFollow Someone. \n(3) Make a tweet."
+        displayUserData((System->allUsers[currentUser]));
+
+        printf("\nPlease choose from the 6 options. \n(1) Follow Someone. \n(2) UnFollow Someone. \n(3) Make a tweet."
                "\n(4) Display your news feed.\n(5) End turn.\n(6) Close program.");
         //checks for non-integer inputs
         while (scanf("%d", &Selection) == 0) {
-            printf("Please input a number between 1-5\n\n");
+            printf("Please input a number between 1-6\n\n");
             scanf("%*s", &Selection);
         }
         fflush(stdin);
@@ -37,10 +41,10 @@ int menu(TwitterSys *System,int currentUser){
                  follow(System,currentUser);
                 break;
             case 2:
-                // UnFollow();
+                 unFollow(System,currentUser);
                 break;
             case 3:
-                //  Tweet();
+                 createTweet(System,currentUser);
                 break;
             case 4:
                 //  NewsFeed();
@@ -80,14 +84,16 @@ void follow(TwitterSys *System,int currentUser){
     char userInput[15];
     fflush(stdin);
     fgets(userInput,15,stdin);
+    userInput[strlen(userInput)-1]='\0';
     i=0;
     while(i<24){
         if(strcmp(userInput,tempNotFollowing[i])==0){
             printf("\nNow following %s",userInput);
-            strcpy(ActiveUser->Following[ActiveUser->numFollowing],userInput);
-            strcpy(System->allUsers[i]->Followers[System->allUsers[i]->numFollowers],ActiveUser->username);
+            strcpy(ActiveUser->Following[i],userInput);
+            strcpy(System->allUsers[i]->Followers[currentUser],ActiveUser->username);
             System->allUsers[i]->numFollowers+=1;
             ActiveUser->numFollowing+=1;
+            break;
         }
         i++;
         if(i==24){
@@ -99,3 +105,42 @@ void follow(TwitterSys *System,int currentUser){
     }
 }
 
+void unFollow(TwitterSys *System,int currentUser){
+    //display all possible users to follow
+    User *ActiveUser = System->allUsers[currentUser];
+    int i=0;
+    char userInput[15];
+    if(ActiveUser->numFollowing<1){
+        printf("\nYou arn't following anyone nothing to do here");
+    }else {
+        printf("\nThese are all the users you can unfollow:");
+        for (int j = 0; j < 24; ++j) {
+            if(strlen(ActiveUser->Following[j])>0) {
+                printf("\n%s", ActiveUser->Following[j]);
+            }
+        }
+
+        printf("\nSimply type the name of the user you want to unfollow");
+        fflush(stdin);
+        fgets(userInput, 15, stdin);
+        userInput[strlen(userInput) - 1] = '\0';
+
+        while (i < 24) {
+            if (strcmp(userInput, ActiveUser->Following[i]) == 0) {
+                printf("\nNow not following %s", userInput);
+                memset(ActiveUser->Following[i],0,strlen(ActiveUser->Following[i]));
+                memset(System->allUsers[i]->Followers[currentUser], 0, strlen(System->allUsers[i]->Followers[currentUser]));
+                System->allUsers[i]->numFollowers -= 1;
+                ActiveUser->numFollowing -= 1;
+                break;
+            }
+            i++;
+            if (i == ActiveUser->numFollowing + 1) {
+                i = 0;
+                fflush(stdin);
+                printf("\nPlease input a user name correctly");
+                fgets(userInput, 15, stdin);
+            }
+        }
+    }
+}
