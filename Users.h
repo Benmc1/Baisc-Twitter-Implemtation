@@ -11,8 +11,8 @@ typedef struct  {
     char username[15];
     unsigned int numFollowers;
     unsigned int numFollowing;
-    struct User *Followers[20];
-    struct User *Following[20];
+    char Followers[24][15];
+    char Following[24][15];
 }User ;
 
 typedef struct {

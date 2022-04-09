@@ -63,6 +63,13 @@ build CMakeFiles/COMP10050.dir/Users.c.obj: C_COMPILER__COMP10050_Debug C$:/User
   OBJECT_DIR = CMakeFiles\COMP10050.dir
   OBJECT_FILE_DIR = CMakeFiles\COMP10050.dir
 
+build CMakeFiles/COMP10050.dir/Follow.c.obj: C_COMPILER__COMP10050_Debug C$:/Users/benmc/COMP10050/Follow.c || cmake_object_order_depends_target_COMP10050
+  DEP_FILE = CMakeFiles\COMP10050.dir\Follow.c.obj.d
+  FLAGS = -g -std=gnu99
+  INCLUDES = -IC:/Users/benmc/COMP10050/.
+  OBJECT_DIR = CMakeFiles\COMP10050.dir
+  OBJECT_FILE_DIR = CMakeFiles\COMP10050.dir
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target COMP10050
@@ -71,7 +78,7 @@ build CMakeFiles/COMP10050.dir/Users.c.obj: C_COMPILER__COMP10050_Debug C$:/User
 #############################################
 # Link the executable COMP10050.exe
 
-build COMP10050.exe: C_EXECUTABLE_LINKER__COMP10050_Debug CMakeFiles/COMP10050.dir/main.c.obj CMakeFiles/COMP10050.dir/Users.c.obj
+build COMP10050.exe: C_EXECUTABLE_LINKER__COMP10050_Debug CMakeFiles/COMP10050.dir/main.c.obj CMakeFiles/COMP10050.dir/Users.c.obj CMakeFiles/COMP10050.dir/Follow.c.obj
   FLAGS = -g
   LINK_LIBRARIES = -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\COMP10050.dir

@@ -8,4 +8,4 @@ include_directories(.)
 add_executable(COMP10050
         main.c
         Users.c
-        Users.h)
+        Users.h Follow.c Follow.h)

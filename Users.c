@@ -34,6 +34,7 @@ TwitterSys * createUsers(){
                 strcpy((System->allUsers[j]->username), testNames[j]);
                 System->allUsers[j]->numFollowing=0;
                 System->allUsers[j]->numFollowers=0;
+                memset(System->allUsers[j]->Following,0,sizeof(System->allUsers[j]->Following) );
             }
         }
     }
