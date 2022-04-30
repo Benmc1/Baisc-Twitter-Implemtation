@@ -1,9 +1,9 @@
 //
-// Created by benmc on 06/04/2022.
-//
+// Created by Ben McDowell on 06/04/2022.
+// Twitter Lite
 #include <stdio.h>
 #include <stdlib.h>
-#include<string.h>
+#include <string.h>
 #include "Users.h"
 
 int menu(TwitterSys* System,int currentUser);
@@ -26,7 +26,7 @@ int menu(TwitterSys *System,int currentUser){
     int Run = 1;
     while (Run == 1) {
         displayUserData((System->allUsers[currentUser]));
-
+        setvbuf(stdout,NULL, _IONBF,0);
         printf("\nPlease choose from the 6 options. \n(1) Follow Someone. \n(2) UnFollow Someone. \n(3) Make a tweet."
                "\n(4) Display your news feed.\n(5) End turn.\n(6) Close program.");
         //checks for non-integer inputs
@@ -44,7 +44,7 @@ int menu(TwitterSys *System,int currentUser){
                  unFollow(System,currentUser);
                 break;
             case 3:
-                 createTweet(System,currentUser);
+                // createTweet(System,currentUser);
                 break;
             case 4:
                 //  NewsFeed();
@@ -61,32 +61,39 @@ int menu(TwitterSys *System,int currentUser){
     }
     return 1;
 }
+
 void follow(TwitterSys *System,int currentUser){
-    //display all possible users to follow
+
     User *ActiveUser = System->allUsers[currentUser];
-    char tempNotFollowing[24][15];
+    char tempNotFollowing[24][16];
     int i =0;
     printf("\nThese are all the users you can follow:");
+    //display all possible users to follow
     while ( i < System->numUsers) {
-        for (int j = 0; j < ActiveUser->numFollowing; ++j) {
-            if(strcmp(System->allUsers[i]->username,ActiveUser->Following[j])==0||currentUser==i){
+        //checks if the ith username in the system is in the array of activeUser's following
+        for (int j = 0; j < (ActiveUser->numFollowing)+1; j++) {
+            if(strcmp(System->allUsers[i]->username,ActiveUser->Following[j])==0||currentUser==i) {
+                //if it matches skip it by incrementing i and start check again with j=0;
                 i++;
-                j=0;
+                j = 0;
             }
         }
-        if(i<System->numUsers) {
+        if(i < System->numUsers) {
             printf("\n%s", System->allUsers[i]->username);
             strcpy(tempNotFollowing[i],System->allUsers[i]->username);
             i++;
         }
     }
+
     printf("\nSimply type the name of the user you want to follow");
     char userInput[15];
     fflush(stdin);
     fgets(userInput,15,stdin);
     userInput[strlen(userInput)-1]='\0';
+
     i=0;
-    while(i<24){
+    while(i<System->numUsers){
+        //uses the array of valid targets to check if the user selected a vaild input
         if(strcmp(userInput,tempNotFollowing[i])==0){
             printf("\nNow following %s",userInput);
             strcpy(ActiveUser->Following[i],userInput);
@@ -96,11 +103,13 @@ void follow(TwitterSys *System,int currentUser){
             break;
         }
         i++;
-        if(i==24){
+        // if the loop gets to the end it prompts the user to make a new input
+        if(i==System->numUsers){
             i=0;
             fflush(stdin);
-            printf("\nPlease input a user name correctly");
+            printf("\nError trying again. Please make sure the user is in the list of users you can follow");
             fgets(userInput,15,stdin);
+            userInput[strlen(userInput)-1]='\0';
         }
     }
 }
@@ -122,10 +131,11 @@ void unFollow(TwitterSys *System,int currentUser){
 
         printf("\nSimply type the name of the user you want to unfollow");
         fflush(stdin);
+        memset(userInput,0,sizeof(char[15]));
         fgets(userInput, 15, stdin);
         userInput[strlen(userInput) - 1] = '\0';
 
-        while (i < 24) {
+        while (i < ActiveUser->numFollowing) {
             if (strcmp(userInput, ActiveUser->Following[i]) == 0) {
                 printf("\nNow not following %s", userInput);
                 memset(ActiveUser->Following[i],0,strlen(ActiveUser->Following[i]));
@@ -135,11 +145,12 @@ void unFollow(TwitterSys *System,int currentUser){
                 break;
             }
             i++;
-            if (i == ActiveUser->numFollowing + 1) {
+            if (i == ActiveUser->numFollowing) {
                 i = 0;
                 fflush(stdin);
                 printf("\nPlease input a user name correctly");
                 fgets(userInput, 15, stdin);
+                userInput[strlen(userInput) - 1] = '\0';
             }
         }
     }
