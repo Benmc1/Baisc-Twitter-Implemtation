@@ -11,6 +11,7 @@ void follow(TwitterSys* System,int currentUser);
 void unFollow(TwitterSys* System,int currentUser);
 void createTweet(TwitterSys* System,int currentUser);
 void newsFeed(TwitterSys* System,int currentUser);
+void deleteUser(TwitterSys* System,int currentUser);
 
 int main() {
     setvbuf(stdout,NULL, _IONBF,0);
@@ -29,11 +30,13 @@ int menu(TwitterSys *System,int currentUser){
     int Run = 1;
     while (Run == 1) {
         displayUserData((System->allUsers[currentUser]));
-        printf("\nPlease choose from the 6 options. \n(1) Follow Someone. \n(2) UnFollow Someone. \n(3) Make a tweet."
-               "\n(4) Display your news feed.\n(5) End turn.\n(6) Close program.");
+        printf("\nPlease choose from the 6 options. \n(1) Follow Someone. "
+               "\n(2) UnFollow Someone. \n(3) Make a tweet."
+               "\n(4) Display your news feed.\n(5) Delete your account."
+               "\n(6) End turn. \n(7) Close program.");
         //checks for non-integer inputs
         while (scanf("%d", &Selection) == 0) {
-            printf("Please input a number between 1-6\n\n");
+            printf("Please input a number between 1-7\n\n");
             scanf("%*s", &Selection);
         }
         fflush(stdin);
@@ -52,9 +55,12 @@ int menu(TwitterSys *System,int currentUser){
                  newsFeed(System,currentUser);
                 break;
             case 5:
-                 Run=0;
+                deleteUser(System,currentUser);
                 break;
             case 6:
+                 Run=0;
+                break;
+            case 7:
                  free(System);
                 return 0;
             default:
@@ -220,4 +226,73 @@ void newsFeed(TwitterSys* System,int currentUser){
         currTweet= nextTweet;//moves through the list
 
     }while(nextTweet != NULL && i < 10 );
+}
+
+void deleteUser(TwitterSys* System,int currentUser) {
+    char Input;
+
+    printf("\nAre you sure you want to delete your account."
+           "Type Y to continue and anything else to exit");
+    scanf("%c", &Input);
+
+    if (Input != 'Y') {
+        //returns to menu
+        printf("\n Exiting...\n");
+        return;
+    } else {
+        tweet *prevTweet = NULL;
+        tweet *currTweet = NULL;
+        tweet *tempTweet = NULL;
+
+        //removing tweets from stack
+        if (System->firstTwt != NULL) {//checks if there are any tweets
+
+            while((strcmp(System->firstTwt->author, System->allUsers[currentUser]->username)) == 0){//check if the first tweet is form the current user
+                    tempTweet = System->firstTwt; //hold the tweet to be deleted
+                    System->firstTwt = (tweet *) System->firstTwt->nextTwt;      //assigns the system ptr to next ptr
+                    free(tempTweet);
+                }
+
+            currTweet = (tweet *) System->firstTwt->nextTwt;//assign pointers
+            prevTweet = System->firstTwt;
+
+            while ( currTweet != NULL){
+                if ((strcmp(currTweet->author, System->allUsers[currentUser]->username)) == 0) {//check if the author is the current user
+                        prevTweet->nextTwt = currTweet->nextTwt;
+                        free(currTweet);
+                        currTweet = (tweet *) prevTweet->nextTwt;
+                }
+            }
+        }
+        int i = 0;
+        int x = 0;
+        int j = 0;
+        // removing from followers+following
+        while(i < System->numUsers){
+            while (x < System->allUsers[currentUser]->numFollowing){//runs for as many following the deleted account has
+                if (System->allUsers[currentUser]->Following[j][0]!='\0'){//runs till its find the pos of the person they're following
+                    //goes to that user and sets the pos of the deleted user to zero
+                    memset(System->allUsers[j]->Followers[currentUser],0,strlen(System->allUsers[j]->Followers[currentUser]));
+                    System->allUsers[j]->numFollowers--;// decrements the followers count
+                    x++;
+                }
+                j++;
+            }
+            x = 0;
+            j = 0;
+            while (x < System->allUsers[currentUser]->numFollowers){
+                if (System->allUsers[currentUser]->Followers[j][0]!='\0'){//runs till its find the pos of the person following the deleted user
+                    //goes to that user and sets the pos of the deleted user to zero
+                    memset(System->allUsers[j]->Following[currentUser],0,strlen(System->allUsers[j]->Following[currentUser]));
+                    System->allUsers[j]->numFollowing--;// decrements the followers count
+                    x++;
+                }
+                j++;
+            }
+        }
+
+        //removing the user from the System list
+        free(System->allUsers[currentUser]);
+        System->allUsers[currentUser]=NULL;
+    }
 }
