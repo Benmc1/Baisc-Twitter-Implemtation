@@ -44,7 +44,7 @@ int menu(TwitterSys *System,int currentUser){
                  unFollow(System,currentUser);
                 break;
             case 3:
-                // createTweet(System,currentUser);
+                 createTweet(System,currentUser);
                 break;
             case 4:
                 //  NewsFeed();
@@ -153,5 +153,39 @@ void unFollow(TwitterSys *System,int currentUser){
                 userInput[strlen(userInput) - 1] = '\0';
             }
         }
+    }
+}
+
+void createTweet(TwitterSys* System,int currentUser){
+    tweet *newTweet;
+    tweet *prevTweet=NULL;
+    tweet *currTweet=NULL;
+
+    //assign space for the new tweet
+    if((newTweet=malloc(sizeof(tweet)))==NULL){//check if space is available
+        printf("Error creating new tweet");
+        return;
+    }else{
+        //adds users name to the tweet
+        strcpy( System->allUsers[currentUser]->username, newTweet->author);
+        newTweet->nextTwt=NULL;//ends the list
+
+        printf("Type what you want to tweet you have 280 character limit");
+        fflush(stdin);
+        fgets(newTweet->text,280,stdin);
+        //makes sure string has termination char
+        newTweet->text[strlen(newTweet->text)-1]='\0';
+
+        if(System->firstTwt==NULL){//checks if there are no tweets
+            System->firstTwt=newTweet;
+        }else {
+            do {
+                //move two pointers till we find the end of the linked list
+                prevTweet = System->firstTwt;
+                currTweet = prevTweet->nextTwt;
+            } while (currTweet != NULL);
+            prevTweet->nextTwt = newTweet;
+        }
+        printf("Tweet successfully created.");
     }
 }

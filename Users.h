@@ -17,7 +17,7 @@ typedef struct  {
 
 typedef struct {
     char author[15];
-    char text[280];
+    char text[281];
     struct tweet *nextTwt;
 }tweet;
 
