@@ -10,8 +10,11 @@ int menu(TwitterSys* System,int currentUser);
 void follow(TwitterSys* System,int currentUser);
 void unFollow(TwitterSys* System,int currentUser);
 void createTweet(TwitterSys* System,int currentUser);
+void newsFeed(TwitterSys* System,int currentUser);
 
 int main() {
+    setvbuf(stdout,NULL, _IONBF,0);
+
     TwitterSys *System = createUsers();
     for (int i = 0; i < (System->numUsers); ++i) {
         // menu system for choosing from the other functions
@@ -26,7 +29,6 @@ int menu(TwitterSys *System,int currentUser){
     int Run = 1;
     while (Run == 1) {
         displayUserData((System->allUsers[currentUser]));
-        setvbuf(stdout,NULL, _IONBF,0);
         printf("\nPlease choose from the 6 options. \n(1) Follow Someone. \n(2) UnFollow Someone. \n(3) Make a tweet."
                "\n(4) Display your news feed.\n(5) End turn.\n(6) Close program.");
         //checks for non-integer inputs
@@ -47,13 +49,13 @@ int menu(TwitterSys *System,int currentUser){
                  createTweet(System,currentUser);
                 break;
             case 4:
-                //  NewsFeed();
+                 newsFeed(System,currentUser);
                 break;
             case 5:
-               Run=0;
+                 Run=0;
                 break;
             case 6:
-                free(System);
+                 free(System);
                 return 0;
             default:
                 printf("Please input a number between 1-6.\n\n");
@@ -85,7 +87,7 @@ void follow(TwitterSys *System,int currentUser){
         }
     }
 
-    printf("\nSimply type the name of the user you want to follow");
+    printf("\nSimply type the name of the user you want to follow\n");
     char userInput[15];
     fflush(stdin);
     fgets(userInput,15,stdin);
@@ -107,7 +109,7 @@ void follow(TwitterSys *System,int currentUser){
         if(i==System->numUsers){
             i=0;
             fflush(stdin);
-            printf("\nError trying again. Please make sure the user is in the list of users you can follow");
+            printf("\nError trying again.\n Please make sure the user is in the list of users you can follow\n");
             fgets(userInput,15,stdin);
             userInput[strlen(userInput)-1]='\0';
         }
@@ -158,34 +160,64 @@ void unFollow(TwitterSys *System,int currentUser){
 
 void createTweet(TwitterSys* System,int currentUser){
     tweet *newTweet;
-    tweet *prevTweet=NULL;
-    tweet *currTweet=NULL;
 
     //assign space for the new tweet
     if((newTweet=malloc(sizeof(tweet)))==NULL){//check if space is available
-        printf("Error creating new tweet");
+        printf("\nError creating new tweet");
         return;
     }else{
         //adds users name to the tweet
-        strcpy( System->allUsers[currentUser]->username, newTweet->author);
+        strcpy( newTweet->author, System->allUsers[currentUser]->username);
         newTweet->nextTwt=NULL;//ends the list
 
-        printf("Type what you want to tweet you have 280 character limit");
+        printf("\nType what you want to tweet you have 280 character limit:\n");
         fflush(stdin);
-        fgets(newTweet->text,280,stdin);
+        fgets(newTweet->text,281,stdin);
         //makes sure string has termination char
-        newTweet->text[strlen(newTweet->text)-1]='\0';
-
+        if((newTweet->text[strlen(newTweet->text) - 1]) == '\n'){
+            newTweet->text[strlen(newTweet->text) - 1] = '\0';
+        }
         if(System->firstTwt==NULL){//checks if there are no tweets
             System->firstTwt=newTweet;
         }else {
-            do {
-                //move two pointers till we find the end of the linked list
-                prevTweet = System->firstTwt;
-                currTweet = prevTweet->nextTwt;
-            } while (currTweet != NULL);
-            prevTweet->nextTwt = newTweet;
+            //sets the new tweet to the top and links to the previous first tweet
+            newTweet->nextTwt = (struct tweet *) System->firstTwt;
+            System->firstTwt = newTweet;
         }
-        printf("Tweet successfully created.");
+        printf("\nTweet successfully created.");
     }
+}
+
+void newsFeed(TwitterSys* System,int currentUser){
+    int i=0;// to keep track of num of tweets printed
+    int x=0;
+    tweet *nextTweet=NULL;
+    tweet *currTweet=NULL;
+
+    printf("\nHere are the latest available tweets from "
+           "you and people you follow:");
+
+    if(System->firstTwt ==NULL){//checks if there are any tweets
+        printf("\nCouldn't find any tweets");
+        return;
+    }
+    currTweet= System->firstTwt;//first sets the pointers
+    do {
+        nextTweet = (tweet *) currTweet->nextTwt;
+        //checks if the users is following the author of the current tweet
+        while (x<System->numUsers){
+          if((strcmp(currTweet->author,System->allUsers[currentUser]->Following[x]))==0){
+              printf("\n%s:\n\t%s",currTweet->author,currTweet->text);
+              i++;
+          }
+          x++;
+        }
+        //checks if the current user is the author of the current tweet
+        if ((strcmp(currTweet->author,System->allUsers[currentUser]->username))==0){
+            printf("\nYou:\n\t%s\n",currTweet->text);
+            i++;
+        }
+        currTweet= nextTweet;//moves through the list
+
+    }while(nextTweet != NULL && i < 10 );
 }
