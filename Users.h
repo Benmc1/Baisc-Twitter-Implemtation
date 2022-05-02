@@ -7,25 +7,7 @@
 
 #endif //COMP10050_USERS_H
 
-typedef struct  {
-    char username[15];
-    unsigned int numFollowers;
-    unsigned int numFollowing;
-    char Followers[24][15];
-    char Following[24][15];
-}User ;
-
-typedef struct {
-    char author[15];
-    char text[281];
-    struct tweet *nextTwt;
-}tweet;
-
-typedef struct {
-    User *allUsers[24];
-    int numUsers;
-    tweet *firstTwt;
-}TwitterSys;
+#include "Structs.h"
 
 void displayUserData(User *n);
 TwitterSys * createUsers(void);
